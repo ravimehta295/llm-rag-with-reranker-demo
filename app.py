@@ -13,6 +13,12 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from sentence_transformers import CrossEncoder
 from streamlit.runtime.uploaded_file_manager import UploadedFile
 
+import os
+os.environ["STREAMLIT_SERVER_ENABLE_FILE_WATCHER"] = "false"  # Disables problematic inspection
+
+import torch
+torch.classes.__path__ = []  # Neutralizes the path inspection
+
 system_prompt = """
 You are an AI assistant tasked with providing detailed answers based solely on the given context. Your goal is to analyze the information provided and formulate a comprehensive, well-structured response to the question.
 
@@ -55,16 +61,18 @@ def process_document(uploaded_file: UploadedFile) -> list[Document]:
     # Store uploaded file as a temp file
     temp_file = tempfile.NamedTemporaryFile("wb", suffix=".pdf", delete=False)
     temp_file.write(uploaded_file.read())
-
     loader = PyMuPDFLoader(temp_file.name)
+    print(temp_file.name)
+    print(loader)
     docs = loader.load()
-    os.unlink(temp_file.name)  # Delete temp file
+    #os.unlink(temp_file.name)  # Delete temp file
 
     text_splitter = RecursiveCharacterTextSplitter(
         chunk_size=400,
         chunk_overlap=100,
         separators=["\n\n", "\n", ".", "?", "!", " ", ""],
     )
+    print(text_splitter) #all text splitter
     return text_splitter.split_documents(docs)
 
 
@@ -83,7 +91,7 @@ def get_vector_collection() -> chromadb.Collection:
         url="http://localhost:11434/api/embeddings",
         model_name="nomic-embed-text:latest",
     )
-
+    print(ollama_ef)
     chroma_client = chromadb.PersistentClient(path="./demo-rag-chroma")
     return chroma_client.get_or_create_collection(
         name="rag_app",
@@ -215,9 +223,8 @@ if __name__ == "__main__":
     with st.sidebar:
         st.set_page_config(page_title="RAG Question Answer")
         uploaded_file = st.file_uploader(
-            "**📑 Upload PDF files for QnA**", type=["pdf"], accept_multiple_files=True
+            "**📑 Upload PDF files for QnA**", type=["pdf"], accept_multiple_files=False
         )
-
         process = st.button(
             "⚡️ Process",
         )
