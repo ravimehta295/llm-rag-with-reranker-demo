@@ -18,6 +18,9 @@ os.environ["STREAMLIT_SERVER_ENABLE_FILE_WATCHER"] = "false"  # Disables problem
 
 import torch
 torch.classes.__path__ = []  # Neutralizes the path inspection
+from fastapi import FastAPI
+
+app = FastAPI()
 
 system_prompt = """
 You are an AI assistant tasked with providing detailed answers based solely on the given context. Your goal is to analyze the information provided and formulate a comprehensive, well-structured response to the question.

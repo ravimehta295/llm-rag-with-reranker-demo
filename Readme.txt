@@ -10,3 +10,5 @@ pip install -r requirements\requirements_dev.txt
 
 
 streamlit run app.py
+
+fastapi dev main.py

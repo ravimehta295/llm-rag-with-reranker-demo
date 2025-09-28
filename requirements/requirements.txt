@@ -4,3 +4,5 @@ sentence-transformers
 streamlit
 PyMuPDF
 langchain-community
+fastapi[standard]
+uvicorn[standard]
